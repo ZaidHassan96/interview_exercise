@@ -363,4 +363,18 @@ export class MessageData {
 
     return chatMessageToObject(updatedResult);
   }
+
+  async addOrUpdateTags(
+    messageId: ObjectID,
+    tags: string[],
+  ): Promise<ChatMessageModel> {
+    const message = await this.chatMessageModel.findById(messageId);
+    if (!message) {
+      throw new Error('Message not found');
+    }
+
+    message.tags = tags;
+    const updatedMessage = await message.save();
+    return chatMessageToObject(updatedMessage);
+  }
 }

@@ -119,4 +119,43 @@ describe('MessageData', () => {
       expect(deletedMessage.deleted).toEqual(true);
     });
   });
+  describe('addOrUpdateTags', () => {
+      it('should add tags to a message', async () => {
+        const conversationId = new ObjectID();
+        const message = await messageData.create(
+          { conversationId, text: 'Message with tags' },
+          senderId,
+        );
+
+        const tags = ['tag1', 'tag2'];
+        const updatedMessage = await messageData.addOrUpdateTags(new ObjectID(message.id), tags);
+
+        expect(updatedMessage.tags).toEqual(tags);
+      });
+
+      it('should update tags of a message', async () => {
+        const conversationId = new ObjectID();
+        const message = await messageData.create(
+          { conversationId, text: 'Message with tags' },
+          senderId,
+        );
+
+       
+        const initialTags = ['tag1', 'tag2'];
+        await messageData.addOrUpdateTags(new ObjectID(message.id), initialTags);
+
+        
+        const updatedTags = ['tag3', 'tag4'];
+        const updatedMessage = await messageData.addOrUpdateTags(new ObjectID(message.id), updatedTags);
+
+        expect(updatedMessage.tags).toEqual(updatedTags);
+      });
+
+      it('should throw an error if message is not found', async () => {
+        const nonExistentMessageId = new ObjectID();
+        const tags = ['tag1', 'tag2'];
+
+        await expect(messageData.addOrUpdateTags(nonExistentMessageId, tags)).rejects.toThrow('Message not found');
+      });
+    });
 });
